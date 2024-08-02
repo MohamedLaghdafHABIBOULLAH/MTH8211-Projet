@@ -13,8 +13,8 @@ function CS(A, b, ϵ)
     Σ = svd(A).S
 
     # Trouve la plus grande v.s. de A et une deuxième valeur inférieure à celle-ci:
-    σ_U = S[1]   
-    σ_L = rand(val)
+    σ_U = Σ[1]   
+    σ_L = rand(Σ)
 
     # Définition des constantes et vecteurs initiaux nécessaires pour l'algorithme de Chebyshev:
     m,n = size(A)
