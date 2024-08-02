@@ -14,10 +14,9 @@ function CS(A, b, ϵ)
 
     # Trouve la plus grande v.s. de A et une deuxième valeur inférieure à celle-ci:
     σ_U = S[1]   
-    val = setdiff(Σ,[σ_U])
     σ_L = rand(val)
 
-    # Définition des constantes initiales pour l'algorithme de Chebyshev:
+    # Définition des constantes et vecteurs initiaux nécessaires pour l'algorithme de Chebyshev:
     m,n = size(A)
     d = (σ_U^2 + σ_L^2)/2
     c = (σ_U^2 - σ_L^2)/2
@@ -28,7 +27,7 @@ function CS(A, b, ϵ)
     x = zeros(n) 
     v = zeros(n)
     r = b
-
+    # Nombre d'itérations max:
     iter = ceil(Int, (log(ϵ)-log(2)) / (log((σ_U-σ_L) / (σ_U+σ_L))) )
 
     # Début de la boucle itérative de Chebyshev:
