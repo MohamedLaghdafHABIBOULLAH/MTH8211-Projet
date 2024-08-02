@@ -45,12 +45,11 @@ x̂ = LSRN_l_sparse(B,b)
 # @test norm(Br*x̂ - b) < 1e-2
 # @test norm(x - x̂)/norm(x) < 1e-2
 
+include("../src/CS.jl")
 
 A = rand(5, 5)
 b = rand(5)
-σ_L = 0.1
-σ_U = 2.0
 ε = 1e-6
 
-x = CS(A, b, σ_L, σ_U, ε)
+x = CS(A, b, ε)
 println("Approximation de x : ", x)
