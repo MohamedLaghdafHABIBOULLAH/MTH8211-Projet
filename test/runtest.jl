@@ -2,6 +2,7 @@
 using Test
 
 include("../src/LSRN.jl")
+include("../src/CS.jl")
 
 m = 100000
 n = 50
@@ -45,7 +46,7 @@ x̂ = LSRN_l_sparse(B,b)
 # @test norm(Br*x̂ - b) < 1e-2
 # @test norm(x - x̂)/norm(x) < 1e-2
 
-include("../src/CS.jl")
+
 # Le test n'est plus bon
 # A = rand(5, 5)
 # b = rand(5)
