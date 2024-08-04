@@ -52,4 +52,4 @@ b = rand(5)
 ε = 1e-6
 
 x = CS(A, b, ε)
-@test norm(Ax-b) < 1e-3
+@test norm(A*x-b) < 1e-3
