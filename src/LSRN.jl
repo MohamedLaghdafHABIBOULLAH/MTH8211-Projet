@@ -9,7 +9,9 @@ LSRN_l(A, b; γ = 3, maxiter = 100, tol = 1e-8)
     LSRN resolves the minimum norm solution of the equation min ||x||_2 s.t. x in argmin ||Ax-b||_2
 There are several variants of  LSRN_l, LSRN_r, LSRN_l_sparse, LSRN_r_sparse.
 """
-
+#=
+Ajouter les valeurs min et max des σ pour chaque algorithme pour être en mesure de l'injecter dans CS(A, b, ϵ, σ_U, σ_L):
+=#
 
 function LSRN_l(A , b; γ = 3, tol = 1e-8)
     m,n = size(A)
@@ -23,7 +25,7 @@ function LSRN_l(A , b; γ = 3, tol = 1e-8)
 
     # Compute A1 = GA.
     A1 = G * A
-
+    
     # Compute SVD of A1.
     _, Σ_1, V_1 = svd(A1)
 
@@ -34,8 +36,18 @@ function LSRN_l(A , b; γ = 3, tol = 1e-8)
     # Define a regularization parameter.
     # λ = 1.0e-3
 
-    y, _ = lsqr(A*N, b, atol = tol, btol=tol)
-    
+    # Obtaining highest and lowest singular values of AN:
+    # TH 4.3: For any ̃α ∈ [0,1-√(r/s)] (in this case r=n):
+    a = 0.1 - sqrt(m/s)
+
+    σ_U = 1 / ((1-a)*sqrt(s)-sqrt(m))
+    σ_L = 1 / ((1+a)*sqrt(s)+sqrt(m))
+
+    # Compute min-length solution: 
+    # y, _ = lsqr(A*N, b, atol = tol, btol=tol)
+
+    y    = CS(A*N, b, σ_U, σ_L, tol)
+
     return N*y
 end
 
@@ -62,8 +74,19 @@ function LSRN_l_sparse(A , b; γ = 3,  tol = 1e-8)
     # Define a regularization parameter.
     # λ = 1.0e-3
 
-    y, _ = lsqr(A*N, b, atol = tol, btol=tol)
-    
+
+    # Obtaining highest and lowest singular values of AN:
+    # TH 4.3: For any ̃α ∈ [0,1-√(r/s)] (in this case r=m):
+    a = 0.1 - sqrt(m/s)
+
+    σ_U = 1 / ((1-a)*sqrt(s)-sqrt(m))
+    σ_L = 1 / ((1+a)*sqrt(s)+sqrt(m))
+
+    # Compute min-length solution: 
+    # y, _ = lsqr(A*N, b, atol = tol, btol=tol)
+
+    y    = CS(A*N, b, σ_U, σ_L, tol)
+
     return N*y
 end
 
@@ -91,7 +114,17 @@ function LSRN_r(A , b; γ = 5,  tol = 1e-8)
     # Define a regularization parameter.
     # λ = 1.0e-3
 
-    x, _ = lsqr(M' * A, M' * b, atol = tol, btol=tol)
+    # Obtaining highest and lowest singular values of AN:
+    # TH 4.3: For any ̃α ∈ [0,1-√(r/s)] (in this case r=n):
+    a = 0.1 - sqrt(n/s)
+
+    σ_U = 1 / ((1-a)*sqrt(s)-sqrt(n))
+    σ_L = 1 / ((1+a)*sqrt(s)+sqrt(n))
+
+    # Compute min-length solution: 
+    x    = CS(M' * A, M' * b, σ_U, σ_L, tol)
+
+    # x, _ = lsqr(M' * A, M' * b, atol = tol, btol=tol)
     
     return x
 end
@@ -118,8 +151,16 @@ function LSRN_r_sparse(A , b; γ = 5, tol = 1e-8)
 
     # Define a regularization parameter.
     # λ = 1.0e-3
+    # Obtaining highest and lowest singular values of AN:
+    # TH 4.3: For any ̃α ∈ [0,1-√(r/s)] (in this case r=m):
+    a = 0.1 - sqrt(n/s)
 
-    x, _ = lsqr(M' * A, M' * b, atol = tol, btol=tol)
+    σ_U = 1 / ((1-a)*sqrt(s)-sqrt(n))
+    σ_L = 1 / ((1+a)*sqrt(s)+sqrt(n))
+
+    # Compute min-length solution: 
+    x    = CS(M' * A, M' * b, σ_U, σ_L, tol)
+    # x, _ = lsqr(M' * A, M' * b, atol = tol, btol=tol)
     
     return x
 end
