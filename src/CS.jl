@@ -1,12 +1,5 @@
-using LinearAlgebra
-using Krylov
-using Random
-using SparseArrays
-using PROPACK
-
-
-function CS(F, b, σ_U, σ_L, tol)
-    m,n = size(F)
+function CS(A, b, σ_U, σ_L, tol, N)
+    _,n = size(A)
     ϵ = tol
     # Définition des constantes et vecteurs initiaux nécessaires pour l'algorithme de Chebyshev:
 
@@ -38,12 +31,11 @@ function CS(F, b, σ_U, σ_L, tol)
             β = (α * c/2)^2
         end
 
-        v = β * v + F' * r
+        v = β * v + N' * A' * r
         y = y + α * v
-        r = r - α * F * v
+        r = r - α * A * N * v
 
     end
-    println("Méthode CS")
     return y
 
 end

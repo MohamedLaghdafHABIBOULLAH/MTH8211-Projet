@@ -1,31 +1,34 @@
-# Test
 using Test
 
 include("../src/LSRN.jl")
-include("../src/CS.jl")
+
+Random.seed!(1234)
 
 m = 100000
 n = 50
 A = rand(m,n)
-
 x = ones(n)
 b = A*x
 
 x̂ = LSRN_l(A,b)
 
+@test norm(A*x̂ - b) < 1e-8
+@test norm(x - x̂)/norm(x) < 1e-10
 
-@test norm(A*x̂ - b) < 1e-2
-@test norm(x - x̂)/norm(x) < 1e-4
+# Test LSRN_l with big and sparse matrix
 
-B = sprand(m,n,0.1)
-b = B*x
+m = 1000000
+n = 1000
+x = rand(n)
+A = sprand(m, n, 0.001)
+b = A * x
 
-x̂ = LSRN_l_sparse(B,b)
+x̂ = LSRN_l(A,b)
 
-@test norm(B*x̂ - b) < 1e-2
-@test norm(x - x̂)/norm(x) < 1e-4
+@test norm(A*x̂ - b) < 1e-8
+@test norm(x - x̂)/norm(x) < 1e-10
 
-# Test LSRN_r
+# Test LSRN_r autre pull !
 
 # Ar = rand(n,m)
 
@@ -45,12 +48,3 @@ x̂ = LSRN_l_sparse(B,b)
 
 # @test norm(Br*x̂ - b) < 1e-2
 # @test norm(x - x̂)/norm(x) < 1e-2
-
-
-# Le test n'est plus bon
-# A = rand(5, 5)
-# b = rand(5)
-# ε = 1e-6
-
-# x = CS(A, b, ε)
-# @test norm(A*x-b) < 1e-3
