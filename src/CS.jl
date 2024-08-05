@@ -1,22 +1,6 @@
-using LinearAlgebra
-using Krylov
-using Random
-using SparseArrays
-using PROPACK
-
-
-#=
-Choisir σ_U et σ_L tq. 0 < σ_L ≤ σ_U pour que σ_i(A) ∈ [σ_L, σ_U] ∀ σ_i ≠ 0
-=#
-
-function CS(A, b, ϵ)
-    m,n = size(A)
-    Σ = svd(A).S
-
-    # Trouve la plus grande v.s. de A et une deuxième valeur inférieure à celle-ci:
-    σ_U = Σ[1]   
-    σ_L = Σ[min(m,n)]
-
+function CS(A, b, σ_U, σ_L, tol, N)
+    _,n = size(A)
+    ϵ = tol
     # Définition des constantes et vecteurs initiaux nécessaires pour l'algorithme de Chebyshev:
 
     d = (σ_U^2 + σ_L^2)/2
@@ -25,9 +9,10 @@ function CS(A, b, ϵ)
     α = 0
     β = 0
 
-    x = zeros(n) 
+    y = zeros(n) 
     v = zeros(n)
     r = b
+
     # Nombre d'itérations max:
     iter = ceil(Int, (log(ϵ)-log(2)) / (log((σ_U-σ_L) / (σ_U+σ_L))) )
 
@@ -46,12 +31,11 @@ function CS(A, b, ϵ)
             β = (α * c/2)^2
         end
 
-        v = β * v + A' * r
-        x = x + α * v
-        r = r - α * A * v
+        v = β * v + N' * A' * r
+        y = y + α * v
+        r = r - α * A * N * v
 
     end
-
-    return x
+    return y
 
 end
