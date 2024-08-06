@@ -2,18 +2,21 @@ using LinearAlgebra
 using Krylov
 using Random
 using SparseArrays
-using PROPACK
 
 """
-LSRN_l(A, b; γ = 2, maxiter = 100, tol = 1e-14)
-    LSRN resolves the minimum norm solution of the equation min ||x||_2 s.t. x in argmin ||Ax-b||_2
-There are several variants of  LSRN_l, LSRN_r, LSRN_l_sparse, LSRN_r_sparse.
+LSRN_l(A, b; γ = 2, tol = 1e-14)
+    LSRN resolves the minimum norm solution of the equation min ||x||_2 s.t. x in argmin ||Ax-b||_2, where A is a tall matrix.
+"""
+
+"""
+LSRN_r(A, b; γ = 2, tol = 1e-14)
+    LSRN resolves the minimum norm solution of the equation min ||x||_2 s.t. x in argmin ||Ax-b||_2, where A is a wide matrix.
 """
 
 include("CS.jl")
 include("utils.jl")
 
-function LSRN_l(A , b; γ = 2, tol = 1e-14)
+function LSRN_l(A , b; γ = 2, tol = 1e-14, subsolver = :CS)
     m,n = size(A)
     @assert m > n
     
@@ -33,58 +36,63 @@ function LSRN_l(A , b; γ = 2, tol = 1e-14)
     P_1 = Diagonal(1 ./ Σ_1)
     N = V_1 * P_1
 
-    # Define a regularization parameter.
-    # λ = 1.0e-3
-
     # Obtaining highest and lowest singular values of AN:
     # TH 4.3: For any ̃α ∈ [0,1-√(r/s)] (in this case r=n):
-    a = 1e-3 # Le choix a = 0. proposé par l'article fonctionne qu'en grande dimension 10^6 * 10^3
+    a = 1e-8 # Le choix a = 0. proposé par l'article fonctionne qu'en grande dimension 10^6 * 10^3
 
     σ_U = 1 / ((1-a)*sqrt(s)-sqrt(r))
     σ_L = 1 / ((1+a)*sqrt(s)+sqrt(r))
 
     # Compute min-length solution: 
-    # y, _ = lsqr(A*N, b, atol = tol, btol=tol)
+    if subsolver == :CS
+        y, L = CS_l(A, b, σ_U, σ_L, tol, N, n)
+    elseif subsolver == :LSQR
+        y, stats = lsqr(A*N, b, axtol = tol, btol = tol, etol = tol,  history = true)
+        L = stats.residuals
+    else
+        error("Unknown subsolver")
+    end
 
-    y = CS(A, b, σ_U, σ_L, tol, N)
-
-    return N * y
+    return N * y, L
 end
 
-function LSRN_r(A , b; γ = 5,  tol = 1e-8)
+function LSRN_r(A , b; γ = 2,  tol = 1e-14, subsolver = :CS)
     m,n = size(A)
     @assert m < n
     
     # set s = ⌈γm⌉.
     s = ceil(Int, γ*m)
     
-    # Generate G = randn(s,m)
-    G = randn(n,s)
-    
     # Compute A1 = GA.
-    A1 = A * G
+    A1 = Generate_AG(A, m, n, s)
     
     # Compute SVD of A1.
     U_1, Σ_1, _ = svd(A1)
+
+    # extract the rank of A1, length of Σ_1
+    r = length(Σ_1)
     
     # Let M =U _1 Σ_1^−1.
     P_1 = Diagonal(1 ./ Σ_1)
     M = U_1 * P_1
 
-    # Define a regularization parameter.
-    # λ = 1.0e-3
-
     # Obtaining highest and lowest singular values of AN:
     # TH 4.3: For any ̃α ∈ [0,1-√(r/s)] (in this case r=n):
-    a = 0.1 - sqrt(n/s)
+    a = 1e-8 # Le choix a = 0. proposé par l'article fonctionne qu'en grande dimension 10^6 * 10^3
 
-    σ_U = 1 / ((1-a)*sqrt(s)-sqrt(n))
-    σ_L = 1 / ((1+a)*sqrt(s)+sqrt(n))
+    σ_U = 1 / ((1-a)*sqrt(s)-sqrt(r))
+    σ_L = 1 / ((1+a)*sqrt(s)+sqrt(r))
 
     # Compute min-length solution: 
-    x    = CS(M' * A, M' * b, σ_U, σ_L, tol)
-
-    # x, _ = lsqr(M' * A, M' * b, atol = tol, btol=tol)
+    x, L = CS_r(A, b, σ_U, σ_L, tol, M, n)
+    if subsolver == :CS
+        x, L = CS_r(A, b, σ_U, σ_L, tol, M, n)
+    elseif subsolver == :LSQR
+        x, stats = lsqr(M' * A, M' * b, axtol = tol, btol = tol, etol = tol, history = true)
+        L = stats.residuals
+    else
+        error("Unknown subsolver")
+    end
     
-    return x
+    return x, L
 end
