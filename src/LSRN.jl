@@ -2,18 +2,21 @@ using LinearAlgebra
 using Krylov
 using Random
 using SparseArrays
-using PROPACK
 
 """
 LSRN_l(A, b; γ = 2, tol = 1e-14)
-    LSRN resolves the minimum norm solution of the equation min ||x||_2 s.t. x in argmin ||Ax-b||_2
-There are several variants of  LSRN_l, LSRN_r, LSRN_l_sparse, LSRN_r_sparse.
+    LSRN resolves the minimum norm solution of the equation min ||x||_2 s.t. x in argmin ||Ax-b||_2, where A is a tall matrix.
+"""
+
+"""
+LSRN_r(A, b; γ = 2, tol = 1e-14)
+    LSRN resolves the minimum norm solution of the equation min ||x||_2 s.t. x in argmin ||Ax-b||_2, where A is a wide matrix.
 """
 
 include("CS.jl")
 include("utils.jl")
 
-function LSRN_l(A , b; γ = 2, tol = 1e-14)
+function LSRN_l(A , b; γ = 2, tol = 1e-14, subsolver = :CS)
     m,n = size(A)
     @assert m > n
     
@@ -35,20 +38,25 @@ function LSRN_l(A , b; γ = 2, tol = 1e-14)
 
     # Obtaining highest and lowest singular values of AN:
     # TH 4.3: For any ̃α ∈ [0,1-√(r/s)] (in this case r=n):
-    a = 1e-3 # Le choix a = 0. proposé par l'article fonctionne qu'en grande dimension 10^6 * 10^3
+    a = 1e-8 # Le choix a = 0. proposé par l'article fonctionne qu'en grande dimension 10^6 * 10^3
 
     σ_U = 1 / ((1-a)*sqrt(s)-sqrt(r))
     σ_L = 1 / ((1+a)*sqrt(s)+sqrt(r))
 
     # Compute min-length solution: 
-    # y, _ = lsqr(A*N, b, atol = tol, btol=tol)
+    if subsolver == :CS
+        y, L = CS_l(A, b, σ_U, σ_L, tol, N, n)
+    elseif subsolver == :LSQR
+        y, stats = lsqr(A*N, b, axtol = tol, btol = tol, etol = tol,  history = true)
+        L = stats.residuals
+    else
+        error("Unknown subsolver")
+    end
 
-    y = CS_l(A, b, σ_U, σ_L, tol, N, r)
-
-    return N * y
+    return N * y, L
 end
 
-function LSRN_r(A , b; γ = 2,  tol = 1e-14)
+function LSRN_r(A , b; γ = 2,  tol = 1e-14, subsolver = :CS)
     m,n = size(A)
     @assert m < n
     
@@ -70,15 +78,21 @@ function LSRN_r(A , b; γ = 2,  tol = 1e-14)
 
     # Obtaining highest and lowest singular values of AN:
     # TH 4.3: For any ̃α ∈ [0,1-√(r/s)] (in this case r=n):
-    a = 1e-3 # Le choix a = 0. proposé par l'article fonctionne qu'en grande dimension 10^6 * 10^3
+    a = 1e-8 # Le choix a = 0. proposé par l'article fonctionne qu'en grande dimension 10^6 * 10^3
 
     σ_U = 1 / ((1-a)*sqrt(s)-sqrt(r))
     σ_L = 1 / ((1+a)*sqrt(s)+sqrt(r))
 
     # Compute min-length solution: 
-    # x, _ = lsqr(M' * A, M' * b, atol = tol, btol=tol)
-
-    x = CS_r(A, b, σ_U, σ_L, tol, M, n)
+    x, L = CS_r(A, b, σ_U, σ_L, tol, M, n)
+    if subsolver == :CS
+        x, L = CS_r(A, b, σ_U, σ_L, tol, M, n)
+    elseif subsolver == :LSQR
+        x, stats = lsqr(M' * A, M' * b, axtol = tol, btol = tol, etol = tol, history = true)
+        L = stats.residuals
+    else
+        error("Unknown subsolver")
+    end
     
-    return x
+    return x, L
 end

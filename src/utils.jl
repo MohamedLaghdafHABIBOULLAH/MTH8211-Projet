@@ -1,3 +1,13 @@
+"""
+    Generate_GA(A, m, n, s; block_sz = 128)
+Generate a random matrix GA = G * A where G is a potentially large random matrix following a normal distribution.
+"""
+
+"""
+    Generate_AG(A, m, n, s; block_sz = 128)
+Generate a random matrix AG = A * G where G is a potentially large random matrix following a normal distribution.
+"""
+
 function Generate_GA(A, m, n, s; block_sz = 128)
 
     # Initialize GA
