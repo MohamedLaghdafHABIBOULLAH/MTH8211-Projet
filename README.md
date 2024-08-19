@@ -1,10 +1,10 @@
 # MTH8211-Projet
 
-# Least Squares Regression with Normalization (LSRN)
+# Least Squares Random  Normalization (LSRN)
 
 ## Introduction
 
-LSRN (Least Squares Regression with Normalization) is a robust, efficient, and scalable algorithm designed to solve large-scale least squares problems. It leverages randomized projections and iterative refinement to achieve high accuracy while maintaining computational efficiency. This method is particularly useful for solving over-determined systems where the number of equations exceeds the number of unknowns.
+LSRN (Least Squares with Random Normal projection) is a robust, efficient, and scalable algorithm designed to solve large-scale least squares problems. It leverages randomized projections and iterative refinement to achieve high accuracy while maintaining computational efficiency. This method is particularly useful for solving over-determined systems where the number of equations exceeds the number of unknowns.
 
 ## Key Features
 
