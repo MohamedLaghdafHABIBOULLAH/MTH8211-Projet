@@ -17,7 +17,7 @@ LSRN (Least Squares Regression with Normalization) is a robust, efficient, and s
 
 ### Problem Statement
 
-Given a matrix $A \in \mathcal{R}^{m \times n}$ and a vector $\vec{b} \in \mathcal{R}^m $, the least squares problem is to find $\vec{x} \in \mathcal{R}^n$ that minimizes the following:
+Given a matrix $A \in \mathbb{R}^{m \times n}$ and a vector $\vec{b} \in \mathbb{R}^m $, the least squares problem is to find $\vec{x} \in \mathbb{R}^n$ that minimizes the following:
 
 $\min_{\vec{x}} \vert A\vec{x}- \vec{b} \vert_2$
 
@@ -63,7 +63,7 @@ Output: Vector $\vec{x}$ that minimizes $||A\vec{x} - \vec{b}|| $
 
 ## Algorithm 3: Chebyshev semi-iterative (CS) method (Meng et al., 2014)
 
-1. Given a matrix $A \in \mathbb{R}^{m \times n}$, let $r = \text{rank}(A)$, a vector $\vec{b} \in \mathcal{R}^m$, and a tolerance $\epsilon > 0$, choose $0 < \sigma_L \leq \sigma_U$ such that all nonzero singular values of $A$ are in $[\sigma_L, \sigma_U]$.
+1. Given a matrix $A \in \mathbb{R}^{m \times n}$, let $r = \text{rank}(A)$, a vector $\vec{b} \in \mathbb{R}^m$, and a tolerance $\epsilon > 0$, choose $0 < \sigma_L \leq \sigma_U$ such that all nonzero singular values of $A$ are in $[\sigma_L, \sigma_U]$.
 2. Set $d = (\sigma_U^2 + \sigma_L^2) / 2, c = (\sigma_U^2 - \sigma_L^2) / 2 , \vec{x}_0 = 0, \vec{v}_0 = 0,$ and $\vec{r}_0 = \vec{b}$.
 3. For $k = 0, 1, \dots, \lceil (\log \epsilon - \log 2) / \log(\sigma_U - \sigma_L) / (\sigma_U + \sigma_L) \rceil$, do:
    - Set:
