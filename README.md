@@ -34,7 +34,7 @@ LSRN solves this problem using the following steps:
 4. **Iterative Refinement**: Refine the solution by solving the original least squares problem iteratively, using the intermediate solution $\vec{y}$ as a starting point.
 
 5. **Final Solution**: Compute the final solution $\vec{x} = R^{-1} \vec{y}$.
-
+<!--
 ### Pseudocode
 
 Input: A matrix $A^{m \times n}$, vector $\vec{b}$ of length m
@@ -79,3 +79,7 @@ Output: Vector $\vec{x}$ that minimizes $||A\vec{x} - \vec{b}|| $
    - $\vec{x}_k \leftarrow \vec{x}_k + \alpha \vec{v}_k$,
    - $\vec{r}_k \leftarrow \vec{r}_k - \alpha A \vec{v}_k$.
 5. End loop.
+-->
+
+## Reference
+
