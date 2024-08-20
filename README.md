@@ -83,3 +83,10 @@ Output: Vector $\vec{x}$ that minimizes $||A\vec{x} - \vec{b}|| $
 
 ## Reference
 
+Xiangrui Meng, Michael A. Saunders, and Michael W. Mahoney. LSRN: A parallel iterative
+solver for strongly over- or underdetermined systems. SIAM Journal on Scientific Computing,
+36(2):C95–C118, 2014. doi: 10.1137/120866580. URL https://doi.org/10.1137/120866580.
+
+A. Montoison, D. Orban, and contributors. Krylov.jl: A Julia basket of hand-picked Krylov
+methods. https://github.com/JuliaSmoothOptimizers/Krylov.jl, June 2020.
+
