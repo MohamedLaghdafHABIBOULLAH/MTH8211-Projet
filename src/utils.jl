@@ -8,10 +8,10 @@ Generate a random matrix GA = G * A where G is a potentially large random matrix
 Generate a random matrix AG = A * G where G is a potentially large random matrix following a normal distribution.
 """
 
-function Generate_GA(A, m, n, s; block_sz = 128)
+function Generate_GA(A, m, n, s, R; block_sz = 128)
 
     # Initialize GA
-    GA = zeros(Float64, s, n)
+    GA = zeros(R, s, n)
 
     # Loop over blocks
     for i in 1:ceil(Int, s / block_sz)
@@ -20,7 +20,7 @@ function Generate_GA(A, m, n, s; block_sz = 128)
         block_len = block_end - block_begin + 1
 
         # Generate random matrix
-        G = randn(block_len, m)
+        G = randn(R,block_len, m)
 
         # Perform matrix multiplication
         GA[block_begin:block_end, :] = G * A
@@ -29,10 +29,10 @@ function Generate_GA(A, m, n, s; block_sz = 128)
     return GA
 end
 
-function Generate_AG(A, m, n, s; block_sz = 128)
+function Generate_AG(A, m, n, s, R; block_sz = 128)
 
     # Initialize GA
-    AG = zeros(Float64, m, s)
+    AG = zeros(R, m, s)
 
     # Loop over blocks
     for i in 1:ceil(Int, s / block_sz)
@@ -41,7 +41,7 @@ function Generate_AG(A, m, n, s; block_sz = 128)
         block_len = block_end - block_begin + 1
 
         # Generate random matrix
-        G = randn(n, block_len)
+        G = randn(R, n, block_len)
 
         # Perform matrix multiplication
         AG[:, block_begin:block_end] = A * G
