@@ -2,6 +2,7 @@ using LinearAlgebra
 using Krylov
 using Random
 using SparseArrays
+using LinearOperators
 
 """
 LSRN_l(A, b; γ = 2, tol = 1e-14)
@@ -16,7 +17,7 @@ LSRN_r(A, b; γ = 2, tol = 1e-14)
 include("CS.jl")
 include("utils.jl")
 
-function LSRN_l(A , b; γ = 2, tol = 1e-14, subsolver = :CS)
+function LSRN_l(A, b; γ::Float64 = 2., tol::Float64 = 1e-10, subsolver = :CS)
     m,n = size(A)
     @assert m > n
     
@@ -42,28 +43,30 @@ function LSRN_l(A , b; γ = 2, tol = 1e-14, subsolver = :CS)
 
     σ_U = 1 / ((1-a)*sqrt(s)-sqrt(r))
     σ_L = 1 / ((1+a)*sqrt(s)+sqrt(r))
-
+    op = LinearOperator(Float64, m, r, false, false, 
+                    (res, v) -> mul!(res, A, N * v),
+                    (res, w) -> mul!(res, N', A' * w))
     # Compute min-length solution: 
     if subsolver == :CS
-        y, L = CS_l(A, b, σ_U, σ_L, tol, N, n)
-    elseif subsolver == :LSQR
-        y, stats = lsqr(A*N, b, axtol = tol, btol = tol, etol = tol,  history = true)
+        t = @elapsed y, L = CS(op, b, σ_U, σ_L, tol, n)
+    elseif subsolver == :LSQR     
+        t = @elapsed y, stats = lsqr(op, b, atol = tol, axtol = tol, btol = tol, etol = tol, history = true)
         L = stats.residuals
     else
         error("Unknown subsolver")
     end
 
-    return N * y, L
+    return N * y, L, t
 end
 
-function LSRN_r(A , b; γ = 2,  tol = 1e-14, subsolver = :CS)
+function LSRN_r(A, b; γ::Float64 = 2., tol::Float64 = 1e-10, subsolver = :CS)
     m,n = size(A)
     @assert m < n
     
     # set s = ⌈γm⌉.
     s = ceil(Int, γ*m)
     
-    # Compute A1 = GA.
+    # Compute A1 = AG.
     A1 = Generate_AG(A, m, n, s)
     
     # Compute SVD of A1.
@@ -84,15 +87,18 @@ function LSRN_r(A , b; γ = 2,  tol = 1e-14, subsolver = :CS)
     σ_L = 1 / ((1+a)*sqrt(s)+sqrt(r))
 
     # Compute min-length solution: 
-    x, L = CS_r(A, b, σ_U, σ_L, tol, M, n)
+    op = LinearOperator(Float64, r, n, false, false, 
+    (res, v) -> mul!(res, M', A * v),
+    (res, w) -> mul!(res, A', M * w))
+
     if subsolver == :CS
-        x, L = CS_r(A, b, σ_U, σ_L, tol, M, n)
+        t = @elapsed x, L = CS(op, M' * b, σ_U, σ_L, tol, n)
     elseif subsolver == :LSQR
-        x, stats = lsqr(M' * A, M' * b, axtol = tol, btol = tol, etol = tol, history = true)
+        t = @elapsed x, stats = lsqr(op, M' * b, atol = tol, axtol = tol, btol = tol, etol = tol, history = true)
         L = stats.residuals
     else
         error("Unknown subsolver")
     end
     
-    return x, L
+    return x, L, t
 end

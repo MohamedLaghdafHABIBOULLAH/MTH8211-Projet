@@ -11,7 +11,7 @@ Generate a random matrix AG = A * G where G is a potentially large random matrix
 function Generate_GA(A, m, n, s; block_sz = 128)
 
     # Initialize GA
-    GA = zeros(s, n)
+    GA = zeros(Float64, s, n)
 
     # Loop over blocks
     for i in 1:ceil(Int, s / block_sz)
@@ -32,7 +32,7 @@ end
 function Generate_AG(A, m, n, s; block_sz = 128)
 
     # Initialize GA
-    AG = zeros(m, s)
+    AG = zeros(Float64, m, s)
 
     # Loop over blocks
     for i in 1:ceil(Int, s / block_sz)
