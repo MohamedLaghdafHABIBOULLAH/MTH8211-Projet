@@ -16,7 +16,7 @@ LSRN_r(A, b; γ = 2, tol = 1e-10)
 include("CS.jl")
 include("utils.jl")
 
-function LSRN_l(A::AbstractArray{R}, b::AbstractVector{R}; γ::Float64 = 2., tol::R = R(1e-10), subsolver = :CS) where {R <: Real}
+function LSRN_l(A::AbstractArray{T}, b::AbstractVector{R}; γ::Float64 = 2., tol::R = R(1e-10), subsolver = :CS) where {T <: Real, R <: Real}
     m,n = size(A)
     @assert m >= n
     
@@ -60,7 +60,7 @@ function LSRN_l(A::AbstractArray{R}, b::AbstractVector{R}; γ::Float64 = 2., tol
     return N * y, L, t
 end
 
-function LSRN_r(A::AbstractArray{R}, b::AbstractVector{R}; γ::Float64 = 2., tol::R = R(1e-10), subsolver = :CS) where {R <: Real}
+function LSRN_r(A::AbstractArray{T}, b::AbstractVector{R}; γ::Float64 = 2., tol::R = R(1e-10), subsolver = :CS) where {T <: Real, R <: Real}
     m,n = size(A)
     @assert m < n
     
