@@ -1,4 +1,5 @@
 using Plots
+using SparseArrays
 
 include("../src/LSRN.jl")
 
@@ -54,7 +55,7 @@ println("Erreur relative LSQR pour x: ", norm(x - x̂_LSQR_r)/norm(x))
 println("Temps LSQR: ", t_LSQR_r)
 println("norme de x̂_LSQR_r " , norm(x̂_LSQR_r))
 
-p2 = Plots.plot(1:length(L_CS), log.(L_CS), xlabel = "iter", ylabel = "residus", label = "CS")
+p2 = Plots.plot(1:length(L_CS_r), log.(L_CS_r), xlabel = "iter", ylabel = "residus", label = "CS")
 plot!(p2, 1:length(L_LSQR_r), log.(L_LSQR_r), label = "LSQR")
 
 savefig(p2, "sparse-right-lsqr-cs.pdf")
