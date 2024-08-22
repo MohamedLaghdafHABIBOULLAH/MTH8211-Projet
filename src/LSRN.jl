@@ -57,7 +57,7 @@ function LSRN_l(A::AbstractArray{T}, b::AbstractVector{R}; γ::Float64 = 2., tol
         error("Unknown subsolver")
     end
 
-    return N * y, L, t
+    return N * y, L
 end
 
 function LSRN_r(A::AbstractArray{T}, b::AbstractVector{R}; γ::Float64 = 2., tol::R = R(1e-10), subsolver = :CS) where {T <: Real, R <: Real}
@@ -102,5 +102,5 @@ function LSRN_r(A::AbstractArray{T}, b::AbstractVector{R}; γ::Float64 = 2., tol
         error("Unknown subsolver")
     end
     
-    return x, L, t
+    return x, L
 end
