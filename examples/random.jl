@@ -12,8 +12,8 @@ function solve_lsrn_l(matrix, name)
     tol = 1e-10
     x_true = rand(size(matrix, 2))
     b = matrix * x_true
-    x, res = LSRN_l(matrix, b, γ = 1.5)
-    x_lsqr, res_lsqr = LSRN_l(matrix, b, γ = 1.5, subsolver = :LSQR)
+    x, res, _ = LSRN_l(matrix, b, γ = 1.5)
+    x_lsqr, res_lsqr, _ = LSRN_l(matrix, b, γ = 1.5, subsolver = :LSQR)
     x_lsqr1, stats_lsqr1 = lsqr(matrix, b, btol = tol, etol = tol, axtol = tol, history = true, itmax = 10000)
     res_lsqr1 = stats_lsqr1.residuals
     x_lsmr, stats_lsmr = lsmr(matrix, b, btol = tol, etol = tol, axtol = tol, history = true, itmax = 10000)
@@ -47,8 +47,8 @@ function solve_lsrn_r(matrix, name)
     tol = 1e-10
     x_true = rand(size(matrix, 2))
     b = matrix * x_true
-    x, res = LSRN_r(matrix, b, γ = 1.5)
-    x_lsqr, res_lsqr = LSRN_r(matrix, b, γ = 1.5, subsolver = :LSQR)
+    x, res, _ = LSRN_r(matrix, b, γ = 1.5)
+    x_lsqr, res_lsqr, _ = LSRN_r(matrix, b, γ = 1.5, subsolver = :LSQR)
     x_lsqr1, stats_lsqr1 = lsqr(matrix, b, btol = tol, etol = tol, axtol = tol, itmax = 10000, history = true)
     res_lsqr1 = stats_lsqr1.residuals
     x_lsmr, stats_lsmr = lsmr(matrix, b, btol = tol, etol = tol, axtol = tol, itmax = 10000, history = true)
