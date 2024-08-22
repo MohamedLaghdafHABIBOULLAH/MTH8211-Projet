@@ -22,12 +22,13 @@ x̂, _ = LSRN_l(A,b)
 m = 100000
 n = 50
 
-Ar = rand(n,m)
+Ar = rand(Float32, n,m)
 
-x = ones(m)
+x = ones(Float32, m)
 b = Ar*x
 
 x̂, _ = LSRN_r(Ar,b)
 
 @test norm(Ar*x̂ - b) < 1e-6
 @test norm(x - x̂)/norm(x) < 1e-1
+@test typeof(x̂) == Vector{Float32}
